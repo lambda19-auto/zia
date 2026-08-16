@@ -1,65 +1,72 @@
-# Run Locally
+# TravelAI — ваш персональный гид
 
-**Prerequisites:**  Node.js
+TravelAI — веб-приложение для планирования путешествий с помощью ИИ и поиска актуальной информации. Приложение состоит из React/Vite-фронтенда и небольшого Express API, который обращается к OpenAI API на серверной стороне.
 
+## Требования
 
-1. Install dependencies:
-   `npm install`
-2. Set the `OPENAI_API_KEY` in [.env.local](.env.local) (or `.env`) to your OpenAI API key — `npm run api` loads these files automatically
-3. Run the API server:
-   `npm run api`
-4. In another terminal, run the app:
-   `npm run dev`
+- Node.js
+- npm
+- OpenAI API key
 
-# Docker
+## Настройка
 
-## Run with Docker Compose
-
-- `docker-compose.yml` — production (SSL)
-- `docker-compose.dev.yml` — without SSL (nginx on port 80 for local testing)
-
-
-### Run local for development
-```bash
-# dev
-docker compose -f docker-compose.dev.yml up --build
-
-# prod
-docker compose up --build
-```
-
-### Deploy to VPS
-
-#### 1) Put only runtime files on VPS
-
-Create a directory on VPS (for example `/p_zia`) and upload:
-
-- `.env`
-- `docker-compose.yml`
-- `tls/fullchain.pem`
-- `tls/privkey.pem`
-
-Optional local folders (for persistent logs):
-
-- `logs/nginx`
-- `logs/app`
-
-#### 2) Deploy on VPS
+1. Установите зависимости:
 
 ```bash
-cd p_zia
-
-docker compose -f docker-compose.yml pull
-docker compose -f docker-compose.yml up -d
+npm install
 ```
 
-#### 3) Update release
+2. Создайте файл `.env.local` или `.env` в корне проекта. В качестве основы можно использовать `.env.example`.
+
+Минимальная конфигурация:
+
+```env
+OPENAI_API_KEY="your_openai_api_key"
+APP_URL="http://localhost:3000"
+```
+
+`OPENAI_API_KEY` используется только серверной частью приложения и не должен попадать в клиентский bundle.
+
+## Локальный запуск
+
+Запустите API-сервер:
 
 ```bash
-cd p_zia
-
-docker compose -f docker-compose.yml pull
-docker compose -f docker-compose.yml up -d
+npm run api
 ```
 
-This way, the VPS never stores project source code — only compose/env/tls and pulled images.
+По умолчанию API слушает порт `8787`.
+
+В отдельном терминале запустите фронтенд:
+
+```bash
+npm run dev
+```
+
+Vite запустит приложение на порту `3000`.
+
+После запуска откройте:
+
+```text
+http://localhost:3000
+```
+
+## npm-команды
+
+```bash
+npm run dev      # запуск Vite dev server
+npm run api      # запуск Express API
+npm run build    # production-сборка фронтенда
+npm run preview  # локальный просмотр production-сборки
+npm run lint     # проверка TypeScript без генерации файлов
+npm run clean    # удаление каталога dist
+```
+
+## Стек
+
+- React 19
+- TypeScript
+- Vite
+- Express
+- Tailwind CSS
+- OpenAI API
