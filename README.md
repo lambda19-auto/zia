@@ -1,68 +1,68 @@
-# TravelAI — ваш персональный гид
+# TravelAI — Your Personal Travel Guide
 
-TravelAI — веб-приложение для планирования путешествий с помощью ИИ и поиска актуальной информации. Приложение состоит из React/Vite-фронтенда и небольшого Express API, который обращается к OpenAI API на серверной стороне.
+TravelAI is a web application for planning trips with the help of AI and up-to-date information search. The application consists of a React/Vite frontend and a lightweight Express API that communicates with the OpenAI API on the server side.
 
-## Требования
+## Requirements
 
 - Node.js
 - npm
 - OpenAI API key
 
-## Настройка
+## Setup
 
-1. Установите зависимости:
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-2. Создайте файл `.env.local` или `.env` в корне проекта. В качестве основы можно использовать `.env.example`.
+2. Create a `.env.local` or `.env` file in the project root. You can use `.env.example` as a starting point.
 
-Минимальная конфигурация:
+Minimum configuration:
 
 ```env
 OPENAI_API_KEY="your_openai_api_key"
 APP_URL="http://localhost:3000"
 ```
 
-`OPENAI_API_KEY` используется только серверной частью приложения и не должен попадать в клиентский bundle.
+`OPENAI_API_KEY` is used only by the server-side application and must never be exposed in the client bundle.
 
-## Локальный запуск
+## Local Development
 
-Запустите API-сервер:
+Start the API server:
 
 ```bash
 npm run api
 ```
 
-По умолчанию API слушает порт `8787`.
+By default, the API listens on port `8787`.
 
-В отдельном терминале запустите фронтенд:
+In a separate terminal, start the frontend:
 
 ```bash
 npm run dev
 ```
 
-Vite запустит приложение на порту `3000`.
+Vite will start the application on port `3000`.
 
-После запуска откройте:
+Once both services are running, open:
 
 ```text
 http://localhost:3000
 ```
 
-## npm-команды
+## npm Scripts
 
 ```bash
-npm run dev      # запуск Vite dev server
-npm run api      # запуск Express API
-npm run build    # production-сборка фронтенда
-npm run preview  # локальный просмотр production-сборки
-npm run lint     # проверка TypeScript без генерации файлов
-npm run clean    # удаление каталога dist
+npm run dev      # Start the Vite development server
+npm run api      # Start the Express API
+npm run build    # Build the frontend for production
+npm run preview  # Preview the production build locally
+npm run lint     # Run TypeScript checks without emitting files
+npm run clean    # Remove the dist directory
 ```
 
-## Стек
+## Tech Stack
 
 - React 19
 - TypeScript
