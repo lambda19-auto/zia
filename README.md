@@ -17,8 +17,10 @@ cp .env.example .env
 # Edit .env and set OPENAI_API_KEY to your real key.
 npm ci
 npm run build
-NODE_ENV=production npm start
+npm start
 ```
+
+In the example `.env` configuration, `NODE_ENV=` is left empty. The command above does not set `NODE_ENV`.
 
 The server listens on port `8787` by default. Set `PORT` to a valid port to change it. Open `http://localhost:8787/` and check `http://localhost:8787/api/health`. Use a process manager (for example systemd) to keep `npm start` running, and configure HTTPS in your reverse proxy. The example `nginx/nginx.conf` expects TLS files at `/etc/nginx/certs/` and proxies to `127.0.0.1:8787`; adapt its certificate paths and hostname for your server. Never commit `.env` or send the key to the browser.
 
