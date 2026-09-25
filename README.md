@@ -20,7 +20,7 @@ npm run build
 npm start
 ```
 
-The example `.env` configuration leaves `NODE_ENV` empty. The server start command does not set it.
+The example `.env` configuration sets `NODE_ENV=development`. The server start command does not override it.
 
 The server listens on port `8787` by default. Set `PORT` to a valid port to change it. Open `http://localhost:8787/` and check `http://localhost:8787/api/health`. Use a process manager (for example systemd) to keep `npm start` running, and configure HTTPS in your reverse proxy. The example `nginx/nginx.conf` expects TLS files at `/etc/nginx/certs/` and proxies to `127.0.0.1:8787`; adapt its certificate paths and hostname for your server. Never commit `.env` or send the key to the browser.
 
