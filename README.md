@@ -20,7 +20,7 @@ npm run build
 npm start
 ```
 
-In the example `.env` configuration, `NODE_ENV=` is left empty. The command above does not set `NODE_ENV`.
+The example `.env` configuration leaves `NODE_ENV` empty. The server start command does not set it.
 
 The server listens on port `8787` by default. Set `PORT` to a valid port to change it. Open `http://localhost:8787/` and check `http://localhost:8787/api/health`. Use a process manager (for example systemd) to keep `npm start` running, and configure HTTPS in your reverse proxy. The example `nginx/nginx.conf` expects TLS files at `/etc/nginx/certs/` and proxies to `127.0.0.1:8787`; adapt its certificate paths and hostname for your server. Never commit `.env` or send the key to the browser.
 
@@ -36,6 +36,8 @@ curl http://127.0.0.1:8787/api/health
 Place a host reverse proxy in front of port `8787` for public HTTPS access. To expose the container directly, change the host port binding in `docker-compose.yml` and provide TLS separately.
 
 ## Development
+
+For local development, set `NODE_ENV=development` in your `.env` file.
 
 Run `npm ci`, then `npm run build && npm start` for the API on port `8787`. In another terminal run `npm run dev` for Vite on port `3000`; Vite proxies `/api` to the Node server. After changing the frontend, `npm run build` refreshes the files served on port `8787`.
 
