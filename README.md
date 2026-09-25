@@ -1,72 +1,47 @@
-# TravelAI — Your Personal Travel Guide
+# TravelAI (zia)
 
-TravelAI is a web application for planning trips with the help of AI and up-to-date information search. The application consists of a React/Vite frontend and a lightweight Express API that communicates with the OpenAI API on the server side.
+React/Vite travel recommendations frontend and Express API. In production one Node.js process (`server.js`) serves the compiled site and `/api` on the same port. The OpenAI key stays on the server.
 
 ## Requirements
 
-- Node.js
-- npm
-- OpenAI API key
+- Node.js 22+ and npm (or Docker with Compose)
+- An OpenAI API key with access to the configured model and web search
 
-## Setup
-
-1. Install dependencies:
+## Run on a server
 
 ```bash
-npm install
+git clone https://github.com/lambda19-auto/zia.git
+cd zia
+git switch dev
+cp .env.example .env
+# Edit .env and set OPENAI_API_KEY to your real key.
+npm ci
+npm run build
+NODE_ENV=production npm start
 ```
 
-2. Create a `.env.local` or `.env` file in the project root. You can use `.env.example` as a starting point.
+The server listens on port `8787` by default. Set `PORT` to a valid port to change it. Open `http://localhost:8787/` and check `http://localhost:8787/api/health`. Use a process manager (for example systemd) to keep `npm start` running, and configure HTTPS in your reverse proxy. The example `nginx/nginx.conf` expects TLS files at `/etc/nginx/certs/` and proxies to `127.0.0.1:8787`; adapt its certificate paths and hostname for your server. Never commit `.env` or send the key to the browser.
 
-Minimum configuration:
-
-```env
-OPENAI_API_KEY="your_openai_api_key"
-APP_URL="http://localhost:3000"
-```
-
-`OPENAI_API_KEY` is used only by the server-side application and must never be exposed in the client bundle.
-
-## Local Development
-
-Start the API server:
+Docker Compose runs the same production server and binds it only to the host loopback interface:
 
 ```bash
-npm run api
+cp .env.example .env
+# Edit .env and set OPENAI_API_KEY.
+docker compose up --build -d
+curl http://127.0.0.1:8787/api/health
 ```
 
-By default, the API listens on port `8787`.
+Place a host reverse proxy in front of port `8787` for public HTTPS access. To expose the container directly, change the host port binding in `docker-compose.yml` and provide TLS separately.
 
-In a separate terminal, start the frontend:
+## Development
+
+Run `npm ci`, then `npm run build && npm start` for the API on port `8787`. In another terminal run `npm run dev` for Vite on port `3000`; Vite proxies `/api` to the Node server. After changing the frontend, `npm run build` refreshes the files served on port `8787`.
+
+## Checks
 
 ```bash
-npm run dev
+npm run lint
+npm test
 ```
 
-Vite will start the application on port `3000`.
-
-Once both services are running, open:
-
-```text
-http://localhost:3000
-```
-
-## npm Scripts
-
-```bash
-npm run dev      # Start the Vite development server
-npm run api      # Start the Express API
-npm run build    # Build the frontend for production
-npm run preview  # Preview the production build locally
-npm run lint     # Run TypeScript checks without emitting files
-npm run clean    # Remove the dist directory
-```
-
-## Tech Stack
-
-- React 19
-- TypeScript
-- Vite
-- Express
-- Tailwind CSS
-- OpenAI API
+`npm test` builds the frontend and runs a smoke test of the single-process server. Live OpenAI requests require a valid key and external API access; the smoke test does not make paid requests.
