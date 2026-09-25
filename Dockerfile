@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
-COPY server.js ./server.js
+COPY server.js agent-prompts.js ./
 USER node
 EXPOSE 8787
 CMD ["node", "server.js"]

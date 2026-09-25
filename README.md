@@ -49,3 +49,21 @@ npm test
 ```
 
 `npm test` builds the frontend and runs a smoke test of the single-process server. Live OpenAI requests require a valid key and external API access; the smoke test does not make paid requests.
+
+## Languages
+
+Use the RU / EN switch in the top-right corner to select Russian or English.
+Russian is the default; the selection is saved locally when browser storage is available.
+The whole interface, errors, and cookie notice follow the selected language.
+Changing language clears previous recommendations and cancels the browser request;
+submit the trip preferences again to generate recommendations in the new language.
+
+`POST /api/recommendations` accepts an optional `language: "ru" | "en"` field.
+Omitting it preserves Russian behavior; unsupported values return HTTP 400.
+The server selects the corresponding instructions, trip prompt, and JSON schema
+field descriptions from `agent-prompts.js`. All generated text, including source
+titles, is requested in the selected language regardless of the query language.
+Budgets remain denominated in RUB in both languages.
+
+The language integration test uses a mocked provider to verify the actual outgoing
+OpenAI payload without paid API calls.

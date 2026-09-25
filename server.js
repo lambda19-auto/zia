@@ -1,4 +1,5 @@
 import express from 'express';
+import { buildPrompt, buildRecommendationSchema, agentInstructions } from './agent-prompts.js';
 import dotenv from 'dotenv';
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
@@ -61,34 +62,11 @@ const sendApiError = (res, status, error) => {
         error,
     });
 };
-const buildPrompt = (body) => {
-    const budget = body.budget || 'medium';
-    const season = body.season || 'summer';
-    const travelers = Math.max(1, Number(body.travelers || 1));
-    const hasChildren = Boolean(body.hasChildren);
-    return `
-Пользователь хочет поехать: "${body.query}".
-Параметры поездки:
-- Бюджет: ${budget === 'low' ? 'экономный (до 100к руб.)' : budget === 'medium' ? 'средний (100-300к руб.)' : 'высокий (от 300к руб.)'}
-- Сезон: ${season}
-- Количество человек: ${travelers}
-- С детьми: ${hasChildren ? 'Да' : 'Нет'}
-
-Найди топ-3 лучших варианта для отдыха, соответствующих этим критериям.
-Для каждого варианта напиши:
-- title: название направления
-- description: краткое описание
-- whyFits: почему этот вариант подходит под критерии
-- estimatedCost: примерная стоимость
-- sources: минимум 1 источник c полями title и url
-
-Отвечай строго в формате JSON по заданной схеме, на русском языке.
-  `.trim();
-};
 app.post('/api/recommendations', async (req, res) => {
     const requestId = String(res.locals.requestId || 'unknown');
     const body = req.body;
     if (!body || typeof body.query !== 'string' || !body.query.trim() || body.query.length > 2000 ||
+        (body.language !== undefined && !['ru', 'en'].includes(body.language)) ||
         (body.budget !== undefined && !['low', 'medium', 'high'].includes(body.budget)) ||
         (body.season !== undefined && !['winter', 'spring', 'summer', 'autumn'].includes(body.season)) ||
         (body.travelers !== undefined && (!Number.isInteger(body.travelers) || body.travelers < 1 || body.travelers > 50)) ||
@@ -119,48 +97,14 @@ app.post('/api/recommendations', async (req, res) => {
             body: JSON.stringify({
                 model: 'gpt-5',
                 tools: [{ type: 'web_search' }],
+                instructions: agentInstructions(body.language),
                 input: buildPrompt(body),
                 text: {
                     format: {
                         type: 'json_schema',
                         name: 'travel_recommendations',
                         strict: true,
-                        schema: {
-                            type: 'object',
-                            additionalProperties: false,
-                            properties: {
-                                recommendations: {
-                                    type: 'array',
-                                    minItems: 3,
-                                    maxItems: 3,
-                                    items: {
-                                        type: 'object',
-                                        additionalProperties: false,
-                                        properties: {
-                                            title: { type: 'string', description: 'Название направления' },
-                                            description: { type: 'string', description: 'Краткое описание' },
-                                            whyFits: { type: 'string', description: 'Почему этот вариант подходит под критерии' },
-                                            estimatedCost: { type: 'string', description: 'Примерная стоимость' },
-                                            sources: {
-                                                type: 'array',
-                                                minItems: 1,
-                                                items: {
-                                                    type: 'object',
-                                                    additionalProperties: false,
-                                                    properties: {
-                                                        title: { type: 'string' },
-                                                        url: { type: 'string' },
-                                                    },
-                                                    required: ['title', 'url'],
-                                                },
-                                            },
-                                        },
-                                        required: ['title', 'description', 'whyFits', 'estimatedCost', 'sources'],
-                                    },
-                                },
-                            },
-                            required: ['recommendations'],
-                        },
+                        schema: buildRecommendationSchema(body.language),
                     },
                 },
             }),
