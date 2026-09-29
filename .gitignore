@@ -7,7 +7,7 @@ coverage/
 .env*
 !.env.example
 
-# Docker runtime artifacts
+# Runtime logs and TLS material
 logs/
 nginx/certs/*.pem
 nginx/certs/*.key

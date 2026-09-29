@@ -1,72 +1,58 @@
-# TravelAI — Your Personal Travel Guide
+# TravelAI (zia)
 
-TravelAI is a web application for planning trips with the help of AI and up-to-date information search. The application consists of a React/Vite frontend and a lightweight Express API that communicates with the OpenAI API on the server side.
+React/Vite travel recommendations frontend and Express API. In production one Node.js process (`server.js`) serves the compiled site and `/api` on the same port. The OpenAI key stays on the server.
 
 ## Requirements
 
-- Node.js
-- npm
-- OpenAI API key
+- Node.js 22+ and npm
+- An OpenAI API key with access to the configured model and web search
 
-## Setup
-
-1. Install dependencies:
+## Run on a server
 
 ```bash
-npm install
+git clone https://github.com/lambda19-auto/zia.git
+cd zia
+git switch dev
+cp .env.example .env
+# Edit .env and set OPENAI_API_KEY to your real key.
+npm ci
+npm run build
+npm start
 ```
 
-2. Create a `.env.local` or `.env` file in the project root. You can use `.env.example` as a starting point.
+The example `.env` configuration sets `NODE_ENV=development`. The server start command does not override it.
 
-Minimum configuration:
+The server listens on port `8787` by default. Set `PORT` to a valid port to change it. Open `http://localhost:8787/` and check `http://localhost:8787/api/health`. Use a process manager (for example systemd) to keep `npm start` running, and configure HTTPS in your reverse proxy. The example `nginx/nginx.conf` expects TLS files at `/etc/nginx/certs/` and proxies to `127.0.0.1:8787`; adapt its certificate paths and hostname for your server. Never commit `.env` or send the key to the browser.
 
-```env
-OPENAI_API_KEY="your_openai_api_key"
-APP_URL="http://localhost:3000"
-```
+## Development
 
-`OPENAI_API_KEY` is used only by the server-side application and must never be exposed in the client bundle.
+For local development, set `NODE_ENV=development` in your `.env` file.
 
-## Local Development
+Run `npm ci`, then `npm run build && npm start` for the API on port `8787`. In another terminal run `npm run dev` for Vite on port `3000`; Vite proxies `/api` to the Node server. After changing the frontend, `npm run build` refreshes the files served on port `8787`.
 
-Start the API server:
+## Checks
 
 ```bash
-npm run api
+npm run lint
+npm test
 ```
 
-By default, the API listens on port `8787`.
+`npm test` builds the frontend and runs a smoke test of the single-process server. Live OpenAI requests require a valid key and external API access; the smoke test does not make paid requests.
 
-In a separate terminal, start the frontend:
+## Languages
 
-```bash
-npm run dev
-```
+Use the RU / EN switch in the top-right corner to select Russian or English.
+Russian is the default; the selection is saved locally when browser storage is available.
+The whole interface, errors, and cookie notice follow the selected language.
+Changing language clears previous recommendations and cancels the browser request;
+submit the trip preferences again to generate recommendations in the new language.
 
-Vite will start the application on port `3000`.
+`POST /api/recommendations` accepts an optional `language: "ru" | "en"` field.
+Omitting it preserves Russian behavior; unsupported values return HTTP 400.
+The server selects the corresponding instructions, trip prompt, and JSON schema
+field descriptions from `agent-prompts.js`. All generated text, including source
+titles, is requested in the selected language regardless of the query language.
+Budgets remain denominated in RUB in both languages.
 
-Once both services are running, open:
-
-```text
-http://localhost:3000
-```
-
-## npm Scripts
-
-```bash
-npm run dev      # Start the Vite development server
-npm run api      # Start the Express API
-npm run build    # Build the frontend for production
-npm run preview  # Preview the production build locally
-npm run lint     # Run TypeScript checks without emitting files
-npm run clean    # Remove the dist directory
-```
-
-## Tech Stack
-
-- React 19
-- TypeScript
-- Vite
-- Express
-- Tailwind CSS
-- OpenAI API
+The language integration test uses a mocked provider to verify the actual outgoing
+OpenAI payload without paid API calls.
