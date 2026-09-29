@@ -97,7 +97,7 @@ test('API selects English and Russian agent instructions and validates language'
     assert.match(english.instructions, /every human-readable value in English/);
     assert.match(english.input, /Number of travelers: 3/);
     assert.match(english.input, /Including children: Yes/);
-    assert.match(english.input, /under RUB 100,000/);
+    assert.match(english.input, /under USD 100,000/);
     assert.match(english.input, /Season: winter/);
     assert.equal(english.text.format.schema.properties.recommendations.items.properties.title.description, 'Destination name');
     assert.match(russian.instructions, /на русском языке/);
