@@ -10,7 +10,7 @@ export const buildPrompt = (body) => {
     if (body.language === 'en') return `
 The user wants to travel: "${body.query}".
 Trip preferences:
-- Budget: ${budget === 'low' ? 'economy (under USD 100,000)' : budget === 'medium' ? 'mid-range (USD 100,000–300,000)' : 'luxury (USD 300,000 or more)'}
+- Budget: ${budget === 'low' ? 'economy (under USD 1,000)' : budget === 'medium' ? 'mid-range (USD 1,000–3,000)' : 'luxury (USD 3,000 or more)'}
 - Season: ${season}
 - Number of travelers: ${travelers}
 - Including children: ${hasChildren ? 'Yes' : 'No'}
