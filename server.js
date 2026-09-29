@@ -89,7 +89,7 @@ app.post('/api/recommendations', async (req, res) => {
         const openaiStartedAt = Date.now();
         const openaiResponse = await fetch(OPENAI_API_URL, {
             method: 'POST',
-            signal: AbortSignal.timeout(120000),
+            signal: AbortSignal.timeout(240000),
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
