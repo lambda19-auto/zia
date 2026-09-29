@@ -4,7 +4,7 @@ React/Vite travel recommendations frontend and Express API. In production one No
 
 ## Requirements
 
-- Node.js 22+ and npm (or Docker with Compose)
+- Node.js 22+ and npm
 - An OpenAI API key with access to the configured model and web search
 
 ## Run on a server
@@ -23,17 +23,6 @@ npm start
 The example `.env` configuration sets `NODE_ENV=development`. The server start command does not override it.
 
 The server listens on port `8787` by default. Set `PORT` to a valid port to change it. Open `http://localhost:8787/` and check `http://localhost:8787/api/health`. Use a process manager (for example systemd) to keep `npm start` running, and configure HTTPS in your reverse proxy. The example `nginx/nginx.conf` expects TLS files at `/etc/nginx/certs/` and proxies to `127.0.0.1:8787`; adapt its certificate paths and hostname for your server. Never commit `.env` or send the key to the browser.
-
-Docker Compose runs the same production server and binds it only to the host loopback interface:
-
-```bash
-cp .env.example .env
-# Edit .env and set OPENAI_API_KEY.
-docker compose up --build -d
-curl http://127.0.0.1:8787/api/health
-```
-
-Place a host reverse proxy in front of port `8787` for public HTTPS access. To expose the container directly, change the host port binding in `docker-compose.yml` and provide TLS separately.
 
 ## Development
 
